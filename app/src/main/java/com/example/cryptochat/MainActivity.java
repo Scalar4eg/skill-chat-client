@@ -1,6 +1,8 @@
 package com.example.cryptochat;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
@@ -15,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView chatWindow;
     private MessageController controller;
+    private Server server;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 myName = input.getText().toString();
-                addTestMessages();
+                server.sendName(myName);
             }
         });
         builder.show();
@@ -57,10 +60,36 @@ public class MainActivity extends AppCompatActivity {
                         new MessageController.Message(text, myName, true)
                 );
                 chatInput.setText("");
+                server.sendMessage(text);
             }
         });
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        server = new Server(new Consumer<Pair<String, String>>() {
+            @Override
+            public void accept(final Pair<String, String> pair) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        controller.addMessage(
+                                new MessageController.Message(pair.second, pair.first, false)
+                        );
+                    }
+                });
+            }
+        });
+        server.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        server.disconnect();
     }
 
     private void addTestMessages() {

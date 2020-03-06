@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>MainActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MainActivity.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.example.cryptochat</span><span class="s0">;</span>
+
+import <span class="s1">androidx.appcompat.app.AppCompatActivity</span><span class="s0">;</span>
+import <span class="s1">androidx.recyclerview.widget.RecyclerView</span><span class="s0">;</span>
+
+import <span class="s1">android.app.AlertDialog</span><span class="s0">;</span>
+import <span class="s1">android.content.DialogInterface</span><span class="s0">;</span>
+import <span class="s1">android.os.Bundle</span><span class="s0">;</span>
+import <span class="s1">android.view.View</span><span class="s0">;</span>
+import <span class="s1">android.widget.Button</span><span class="s0">;</span>
+import <span class="s1">android.widget.EditText</span><span class="s0">;</span>
+
+public class <span class="s1">MainActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity {</span>
+    <span class="s0">private static </span><span class="s1">String myName = </span><span class="s2">&quot;&quot;</span><span class="s0">;</span>
+
+    <span class="s1">RecyclerView chatWindow</span><span class="s0">;</span>
+    private <span class="s1">MessageController controller</span><span class="s0">;</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) {</span>
+        <span class="s0">super</span><span class="s1">.onCreate(savedInstanceState)</span><span class="s0">;</span>
+        <span class="s1">setContentView(R.layout.activity_main)</span><span class="s0">;</span>
+
+        <span class="s1">AlertDialog.Builder builder = </span><span class="s0">new </span><span class="s1">AlertDialog.Builder(</span><span class="s0">this</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">builder.setTitle(</span><span class="s2">&quot;Enter your name&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        final <span class="s1">EditText input = </span><span class="s0">new </span><span class="s1">EditText(</span><span class="s0">this</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">builder.setView(input)</span><span class="s0">;</span>
+        <span class="s1">builder.setPositiveButton(</span><span class="s2">&quot;Save&quot;</span><span class="s0">, new </span><span class="s1">DialogInterface.OnClickListener() {</span>
+            @Override
+            <span class="s0">public void </span><span class="s1">onClick(DialogInterface dialog</span><span class="s0">, int </span><span class="s1">which) {</span>
+                myName = input.getText().toString()<span class="s0">;</span>
+                <span class="s1">addTestMessages()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        })<span class="s0">;</span>
+        <span class="s1">builder.show()</span><span class="s0">;</span>
+
+        <span class="s1">chatWindow = findViewById(R.id.chatWindow)</span><span class="s0">;</span>
+
+        <span class="s1">controller = </span><span class="s0">new </span><span class="s1">MessageController()</span><span class="s0">;</span>
+
+        <span class="s1">controller</span>
+                .setIncomingLayout(R.layout.incoming_message)
+                .setOutgoingLayout(R.layout.outgoing_message)
+                .setMessageTextId(R.id.messageText)
+                .setMessageTimeId(R.id.messageTime)
+                .setUserNameId(R.id.userName)
+                .appendTo(chatWindow<span class="s0">, this</span><span class="s1">)</span><span class="s0">;</span>
+
+        final <span class="s1">EditText chatInput = findViewById(R.id.chatInput)</span><span class="s0">;</span>
+        <span class="s1">Button sendMessage = findViewById(R.id.sendMessage)</span><span class="s0">;</span>
+
+        <span class="s1">sendMessage.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() {</span>
+            @Override
+            <span class="s0">public void </span><span class="s1">onClick(View v) {</span>
+                String text = chatInput.getText().toString()<span class="s0">;</span>
+                <span class="s1">controller.addMessage(</span>
+                        <span class="s0">new </span><span class="s1">MessageController.Message(text</span><span class="s0">, </span><span class="s1">myName</span><span class="s0">, true</span><span class="s1">)</span>
+                )<span class="s0">;</span>
+                <span class="s1">chatInput.setText(</span><span class="s2">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        })<span class="s0">;</span>
+
+
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">addTestMessages() {</span>
+        controller.addMessage(
+                <span class="s0">new </span><span class="s1">MessageController.Message(</span><span class="s2">&quot;Всем приветы в этом чате! Очень рад узнать наконец как разрабатываются приложения под Android=)))))&quot;</span><span class="s0">, </span><span class="s2">&quot;Лунатик&quot;</span><span class="s0">, false</span><span class="s1">)</span>
+        )<span class="s0">;</span>
+        <span class="s1">controller.addMessage(</span>
+                <span class="s0">new </span><span class="s1">MessageController.Message(</span><span class="s2">&quot;И тебе привет&quot;</span><span class="s0">, </span><span class="s1">myName</span><span class="s0">, true</span><span class="s1">)</span>
+        )<span class="s0">;</span>
+    <span class="s1">}</span>
+}
+</pre>
+</body>
+</html>

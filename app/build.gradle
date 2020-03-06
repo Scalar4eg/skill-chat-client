@@ -28,4 +28,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     implementation 'com.android.support:recyclerview-v7:28.0.0'
+
+    implementation "org.java-websocket:Java-WebSocket:1.4.0"
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
