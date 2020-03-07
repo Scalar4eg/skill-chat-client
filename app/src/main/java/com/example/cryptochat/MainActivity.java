@@ -8,9 +8,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private static String myName = "";
@@ -63,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 server.sendMessage(text);
             }
         });
-
-
     }
 
     @Override
@@ -82,6 +82,17 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+        }, new Consumer<Pair<String, String>>() {
+            @Override
+            public void accept(final Pair<String, String> pair) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String text = String.format("From %s: %s", pair.first, pair.second);
+                        Toast.makeText(MainActivity.this, text, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
         });
         server.connect();
     }
@@ -90,14 +101,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         server.disconnect();
-    }
-
-    private void addTestMessages() {
-        controller.addMessage(
-                new MessageController.Message("Всем приветы в этом чате! Очень рад узнать наконец как разрабатываются приложения под Android=)))))", "Лунатик", false)
-        );
-        controller.addMessage(
-                new MessageController.Message("И тебе привет", myName, true)
-        );
     }
 }

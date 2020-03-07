@@ -21,9 +21,11 @@ public class Server {
     private WebSocketClient client;
     private Map<Long, String> names = new ConcurrentHashMap<>();
     private Consumer<Pair<String, String>> onMessageReceived;
+    private Consumer<Pair<String, String>> onPrivateMessage;
 
-    public Server(Consumer<Pair<String, String>> onMessageReceived) {
+    public Server(Consumer<Pair<String, String>> onMessageReceived, Consumer<Pair<String, String>> onPrivateMessage) {
         this.onMessageReceived = onMessageReceived;
+        this.onPrivateMessage = onPrivateMessage;
     }
 
     public void connect() {
@@ -72,7 +74,22 @@ public class Server {
     }
 
     public void sendMessage(String text) {
+        long receiver = Protocol.Message.GROUP_CHAT;
+        if (text.contains("@")) {
+            String name = text.split("@")[0].trim();
+            for(Long id : names.keySet()) {
+                if (names.get(id).equals(name)) {
+                    receiver = id;
+                }
+            }
+        }
+        try {
+            text = Crypto.encrypt(text);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Protocol.Message mess = new Protocol.Message(text);
+        mess.setReceiver(receiver);
         if (client != null && client.isOpen()) {
             client.send(Protocol.packMessage(mess));
         }
@@ -99,9 +116,20 @@ public class Server {
         if (name == null) {
             name = "Unnamed";
         }
-
-        onMessageReceived.accept(
-            new Pair<>(name, message.getEncodedText())
-        );
+        String text = null;
+        try {
+            text = Crypto.decrypt(message.getEncodedText());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (message.getReceiver() == Protocol.Message.GROUP_CHAT) {
+            onMessageReceived.accept(
+                    new Pair<>(name, text)
+            );
+        } else {
+            onPrivateMessage.accept(
+                    new Pair<>(name, text)
+            );
+        }
     }
 }

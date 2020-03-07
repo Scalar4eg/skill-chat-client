@@ -8,7 +8,7 @@ public class Protocol {
     public final static int USER_NAME = 3;
 
     static class Message {
-        private final static int GROUP_CHAT = 1;
+        public final static int GROUP_CHAT = 1;
         private long sender;
         private long receiver = GROUP_CHAT;
         private String encodedText;
